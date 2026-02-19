@@ -30,3 +30,18 @@ Vd_max = max(Vd_c(id))
 RoA = zeros(size(x1)); 
 RoA(id) = 1; 
 figure, contourf(x1,x2,RoA), colorbar 
+
+% We can integrate points in the region of attraction backwards in time 
+% to discover more points/trends in the region of attraction
+[t,y] = ode45(@ode,[0.4,0],1/10*[1;1]);
+
+hold on, plot(y(:,1), y(:,2), 'g-', 'linewidth', 3)
+
+function xdot = ode(t, x)
+    x1 = x(1); 
+    x2 = x(2); 
+    x1dot = -4*x1 + 2*x2 - 3 * x1^2 - x1^3; 
+    x2dot = 2*x1 - 4*x2 - 3*x2^2 - x2^3; 
+
+    xdot = [x1dot; x2dot]; 
+end 
