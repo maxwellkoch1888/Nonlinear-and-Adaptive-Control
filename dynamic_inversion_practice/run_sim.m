@@ -6,7 +6,7 @@ u_eq = [0; -0.001389023473370; 0; 0.282388376195832];
 model = @base_aero;
 
 % Define controller type: 1 for p, 2 for reference tracking
-ctrl = 2;
+ctrl = 1;
 
 % Initial state with perturbation
 x0 = x_eq;
@@ -21,6 +21,14 @@ end
 ops = odeset('AbsTol',1e-10,'RelTol',1e-10, 'OutputFcn', @odeplot);
 [t,x] = ode45(@(t,state) ode_0th(t,state,model,x_eq,u_eq,ctrl), ...
               [0 5], x0, ops);
+
+if ctrl == 2
+    omega_ref_plot = pi/180 * [
+        5*sin(2*t), ...
+       -2*sin(t), ...
+        sin(t)
+    ];
+end 
 
 % Plot results
 figure
@@ -39,11 +47,20 @@ subplot(2,2,2)
 plot(t, x(:,4)*180/pi, 'LineWidth', 2); hold on
 plot(t, x(:,5)*180/pi, 'LineWidth', 2);
 plot(t, x(:,6)*180/pi, 'LineWidth', 2);
+if ctrl == 2
+    plot(t, omega_ref_plot(:,1)*180/pi, '--', 'LineWidth', 2)
+    plot(t, omega_ref_plot(:,2)*180/pi, '--', 'LineWidth', 2)
+    plot(t, omega_ref_plot(:,3)*180/pi, '--', 'LineWidth', 2)
+end 
 grid on
 title('Angular Rates')
 ylabel('Rate [deg]')
 xlabel('Time [sec]')
-legend('p','q','r')
+if ctrl == 2 
+    legend('p','q','r', 'p_{ref}', 'q_{ref}', 'r_{ref}')
+else 
+    legend('p','q','r')
+end 
 
 subplot(2,2,3)
 plot(t, x(:,7)*180/pi, 'LineWidth', 2); hold on

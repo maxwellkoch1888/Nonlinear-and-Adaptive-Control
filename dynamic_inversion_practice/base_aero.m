@@ -17,7 +17,7 @@ z_f     = state(12);
 % Derived Quantities
 V       = sqrt(V_xb^2+V_yb^2+V_zb^2);
 alpha   = atan(V_zb/V_xb);
-beta    = sin(V_yb/V);
+beta    = asin(V_yb/V);
 
 % Control Variables
 delta_a = control(1);
