@@ -1,4 +1,5 @@
-clear all; close all; 
+clear all; close all; clc;
+format long g
 
 % Trim condition and model 
 x_eq = 1e4*[0.063502542642571; 0; 0.003196923248873; 0; 0; 0; 0; 0.000005030076610; 0; 0; 0; -1.500000000000000];
@@ -6,7 +7,7 @@ u_eq = [0; -0.001389023473370; 0; 0.282388376195832];
 model = @base_aero;
 
 % Define controller type: 1 for p, 2 for reference tracking
-ctrl = 1;
+ctrl = 2;
 
 % Initial state with perturbation
 x0 = x_eq;

@@ -155,6 +155,9 @@ C_ell = C_ell_beta*beta + C_ell_pbar*pbar + ...
 C_m = C_m_0 + C_m_alpha*alpha + C_m_qbar*qbar + C_m_delta_e*delta_e;
 C_n = C_n_beta*beta + (C_n_Lpbar*C_L_1+C_n_pbar)*pbar + C_n_rbar*rbar + ...
       (C_n_Ldelta_a*C_L_1 + C_n_delta_a)*delta_a + C_n_delta_r*delta_r;
+% C_m_0
+% C_m_alpha*alpha
+% C_m_qbar*qbar
 
 % Resultant Body Forces (See Eq. 38)
 F_b = 1/2*rho*V^2*S_w * [C_L*sin(alpha) - C_S*cos(alpha)*sin(beta) - C_D*cos(alpha)*cos(beta);
