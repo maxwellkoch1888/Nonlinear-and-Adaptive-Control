@@ -1,4 +1,4 @@
-function u = pi_controller(t,state,x_eq,u_eq,model)
+function u = p_controller(t,state,x_eq,u_eq,model)
 % omega_dot = f(x) + G(x)*controls
 
 % Aerodynamic Properties
@@ -35,7 +35,7 @@ omega = state(4:6);
 
 % Velocity and aerodynamic variables
 V = sqrt(state(1)^2 + state(2)^2 + state(3)^2); 
-alpha = atan(state(3)/state(1));
+alpha = atan2(state(3),state(1));
 beta = asin(state(2)/V);
 pbar = p*b_w/(2*V);
 qbar = q*cbar_w/(2*V);
@@ -46,24 +46,31 @@ C_L1 = C_L_0 + C_L_alpha*alpha;
 [~,~,~,rho] = atmosisa(real(-state(12))*0.3048);  % meters
 rho = rho * 0.001940320; % slug/ft^3
 
-% Define desired rates
-omega_des = [0; 0; 0]; 
-
 % Define desired angular acceleration with proportional controller
-% Kp = diag([2,30,2]);
 Kp = diag([2,2,2]);
-omegadot_des = -Kp * (omega - omega_des); 
+omegadot_des = -Kp * (omega); % desired is zero 
+% disp('omegadot_des')
+% disp(omegadot_des)
+% disp('')
 
-% Current model output
-[~, ~, hmat, Imat, ~, ~] = model(state,u_eq); 
+% hmat
+h_xb = 160;
+h_yb = 0;
+h_zb = 0;
+hmat = [0, -h_zb, h_yb; h_zb, 0, -h_xb; -h_yb, h_xb, 0];
 
-% Pull out inertia terms, calculate inertia term
-Ixx = Imat(1,1);  Iyy = Imat(2,2);  Izz = Imat(3,3);
-Ixy = -Imat(1,2); Ixz = -Imat(1,3); Iyz = -Imat(2,3);
+% Imat
+Ixx = 9496;
+Iyy = 55814;
+Izz = 63100;
+Ixy = 0;
+Ixz = 982;
+Iyz = 0;
+Imat = [Ixx, -Ixy, -Ixz; -Ixy, Iyy, -Iyz; -Ixz, -Iyz, Izz];
 
-inertia_effects = [(Iyy-Izz)*q*r + Iyz*(q^2-r^2) + Ixz*p*q - Ixy*p*r; 
-                   (Izz-Ixx)*p*r + Ixz*(r^2-p^2) + Ixy*q*r - Iyz*p*q;
-                   (Ixx-Iyy)*p*q + Ixy*(p^2-q^2) + Iyz*p*r - Ixz*q*r];
+pqr_term = [(Iyy-Izz)*q*r + Iyz*(q^2-r^2) + Ixz*p*q - Ixy*p*r; 
+            (Izz-Ixx)*p*r + Ixz*(r^2-p^2) + Ixy*q*r - Iyz*p*q;
+            (Ixx-Iyy)*p*q + Ixy*(p^2-q^2) + Iyz*p*r - Ixz*q*r];
 
 % Dynamic inversion terms
 Gamma = 0.5*rho*V^2*S_w * diag([b_w, cbar_w, b_w]);
@@ -76,7 +83,7 @@ C_control = [ C_ell_delta_a, 0, C_ell_delta_r;
              (C_n_Ldelta_a*C_L1 + C_n_delta_a), 0, C_n_delta_r ];
 
 % Calculate f(x) 
-f = Imat \ (Gamma * C_states + inertia_effects + hmat*omega);
+f = Imat \ (Gamma * C_states + pqr_term + hmat*[p;q;r]);
 
 % Calculate G(x)
 G = Imat \ (Gamma * C_control);
@@ -88,4 +95,6 @@ delta = pinv(G)*(omegadot_des - f);
 u = u_eq;
 u(1:3) = u_eq(1:3) + delta;
 u(4) = 0.282388376195832;
+disp('control M_b')
+disp(Gamma*C_states + Gamma*C_control*u(1:3))
 end

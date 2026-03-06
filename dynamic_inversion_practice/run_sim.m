@@ -54,7 +54,7 @@ if ctrl == 2
 end 
 grid on
 title('Angular Rates')
-ylabel('Rate [deg]')
+ylabel('Rate [deg/sec]')
 xlabel('Time [sec]')
 if ctrl == 2 
     legend('p','q','r', 'p_{ref}', 'q_{ref}', 'r_{ref}')

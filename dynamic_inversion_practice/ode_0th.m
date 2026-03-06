@@ -1,8 +1,8 @@
 function [state_dot,u] = ode_0th(t,state,model,x_eq,u_eq,ctrl)
 
 % Select control
-if ctrl == 1
-    u = p_controller(t,state,x_eq,u_eq,model);
+if ctrl == 1   
+    u = p_controller(t,state,x_eq,u_eq,model);  
 elseif ctrl == 2
     z = state(13:15);   % integral error states
     [u, z_dot] = pi_controller(t,state,x_eq,u_eq,model);
@@ -29,7 +29,6 @@ z_f     = state(12);
 
 % Gimbal check...
 if abs(theta)*180/pi > 80
-    t
     fprintf('Gimbal lock. Exiting...')
     return;
 end
@@ -61,6 +60,11 @@ pqrdot = Imat \ ( M_b + hmat*[p;q;r] + pqr_term );
 xyzdot = rot_mat*[V_xb; V_yb; V_zb];
 eulerdot = euler_mat*[p;q;r];
 xdot_aircraft = [Vdot; pqrdot; eulerdot; xyzdot];
+% disp('pqrdot')
+% disp(pqrdot)
+disp('model M_b')
+disp(M_b)
+disp('')
 
 % Add integral states if necessary 
 if ctrl == 2
